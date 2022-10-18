@@ -81,7 +81,7 @@ function TOOL:FixRotatingPos( ent )
 	if ( typ == 2 ) then pos = pos + ent:GetRight() * ( max.y / 3.1 ) * doubl end
 
 	-- L4D2 doors
-	if ( typ == 4 ) then pos = pos + ent:GetRight() * ( max.y / 2.34 ) * doubl end
+	if ( typ == 4 ) then pos = pos + ent:GetRight() * ( max.y / 2.34 ) * doubl end -- This really should be more dynamic!
 	if ( typ == 5 ) then pos = pos + ent:GetRight() * ( max.y / 2.04 ) * doubl end
 	if ( typ == 6 ) then pos = pos + ent:GetRight() * ( max.y / 2.21 ) * doubl end
 	if ( typ == 7 ) then pos = pos + ent:GetRight() * ( max.y / 2.057 ) * doubl end
@@ -101,8 +101,20 @@ if ( SERVER ) then
 	numpad.Register( "prop_door_close", function( ply, prop_door ) if ( !IsValid( prop_door ) ) then return false end prop_door:Fire( "Close" ) end )
 	numpad.Register( "prop_door_lock", function( ply, prop_door ) if ( !IsValid( prop_door ) ) then return false end prop_door:Fire( "Lock" ) end )
 	numpad.Register( "prop_door_unlock", function( ply, prop_door ) if ( !IsValid( prop_door ) ) then return false end prop_door:Fire( "Unlock" ) end )
+	
+	function EnsureNameIsUnique( input )
+		local doors = ents.FindByName( input )
+		if ( #doors > 1 ) then
+			--ErrorNoHalt( "Map already has 2 doors with name ", input , "\n" )
+			-- Could probably use a while loop here...
+			return EnsureNameIsUnique( input .. "_2" )
+		end
+		
+		return input
+	end
 
 	function MakeDoorRotating( ply, model, pos, ang, _oSkin, keyOpen, keyClose, keyLock, keyUnlock, _oHardware, _oDistance, _oSpeed, _oReturnDelay, _oTargetName, data )
+
 		if ( IsValid( ply ) && !ply:CheckLimit( "prop_doors" ) ) then return nil end
 
 		local prop_door_rotating = ents.Create( "prop_door_rotating" )
@@ -110,6 +122,7 @@ if ( SERVER ) then
 
 		prop_door_rotating:SetModel( model )
 		prop_door_rotating:SetPos( pos )
+		
 		if ( data && data.initialAngles ) then ang = data.initialAngles end
 		prop_door_rotating:SetAngles( ang )
 
@@ -140,7 +153,13 @@ if ( SERVER ) then
 		local spawnpos
 		if ( data && data.spawnpos ) then spawnpos = data.spawnpos end
 
-		prop_door_rotating:SetKeyValue( "targetname", targetname )
+		if ( targetname && targetname:len() > 0 ) then
+			-- We gotta make sure there are no more than 2 doors with the same name, because only 2 can be linked at a time.
+			targetname = EnsureNameIsUnique( targetname )
+
+			prop_door_rotating:SetKeyValue( "targetname", targetname )
+		end
+
 		prop_door_rotating:SetKeyValue( "hardware", hardware )
 		prop_door_rotating:SetKeyValue( "distance", distance )
 		prop_door_rotating:SetKeyValue( "speed", speed )
@@ -212,10 +231,12 @@ if ( SERVER ) then
 		DoPropSpawnedEffect( prop_door_rotating )
 
 		return prop_door_rotating
+
 	end
 	duplicator.RegisterEntityClass( "prop_door_rotating", MakeDoorRotating, "model", "pos", "ang", "skin", "keyOpen", "keyClose", "keyLock", "keyUnlock", "rHardware", "rDistance", "rSpeed", "auto_close_delay", "targetname", "rb655_dupe_data" )
 
 	function MakeDoorDynamic( ply, model, pos, ang, keyOpen, keyClose, keyLock, keyUnlock, auto_close_delay, skin )
+
 		if ( IsValid( ply ) && !ply:CheckLimit( "prop_doors" ) ) then return false end
 
 		local prop_door_dynamic = ents.Create( "prop_door_dynamic" )
@@ -266,12 +287,14 @@ if ( SERVER ) then
 		end
 
 		return prop_door_dynamic
+
 	end
 	duplicator.RegisterEntityClass( "prop_door_dynamic", MakeDoorDynamic, "model", "pos", "ang", "keyOpen", "keyClose", "keyLock", "keyUnlock", "auto_close_delay", "skin" )
 
 end
 
 function TOOL:LeftClick( trace )
+
 	if ( trace.HitSky || !trace.HitPos ) then return false end
 	if ( IsValid( trace.Entity ) ) then return false end
 	if ( CLIENT ) then return true end
@@ -309,17 +332,22 @@ function TOOL:LeftClick( trace )
 		prop_door.door:Fire( "SetAnimation", "idleclosed" )
 		prop_door.door:Fire( "SetAnimation", "idle" )]]
 	else
-		prop_door = MakeDoorRotating( ply, mdl, trace.HitPos, ang, doorSkin, kO, kC, kL, kU, rH, rD, rS, auto_close_delay, "rb655_door_" .. gDoorUniqueID )
+		prop_door = MakeDoorRotating( ply, mdl, trace.HitPos, ang, doorSkin, kO, kC, kL, kU, rH, rD, rS, auto_close_delay )
 		self:FixRotatingPos( prop_door )
 
 		if ( self:GetClientNumber( "r_double" ) == 1 ) then
-			ang:RotateAroundAxis( Vector( 0, 0, 1 ), 180 )
+			local ang2 = Angle( ang ) -- Make a copy
+			ang2:RotateAroundAxis( Vector( 0, 0, 1 ), 180 )
 
-			prop_door2 = MakeDoorRotating( ply, mdl, trace.HitPos, ang, doorSkin, kO, kC, kL, kU, rH, rD, rS, auto_close_delay, "rb655_door_" .. gDoorUniqueID )
+			local name = "rb655_door_" .. gDoorUniqueID
+			gDoorUniqueID = gDoorUniqueID + 1
+
+			prop_door2 = MakeDoorRotating( ply, mdl, trace.HitPos, ang2, doorSkin, kO, kC, kL, kU, rH, rD, rS, auto_close_delay, name )
+			prop_door:SetKeyValue( "targetname", name )
+			prop_door.rb655_dupe_data.targetname = name
+
 			self:FixRotatingPos( prop_door2 )
 		end
-
-		gDoorUniqueID = gDoorUniqueID + 1
 	end
 
 	undo.Create( "prop_door" )
@@ -329,9 +357,11 @@ function TOOL:LeftClick( trace )
 	undo.Finish()
 
 	return true
+
 end
 
 function TOOL:UpdateGhostEntity( ent, ply )
+
 	if ( !IsValid( ent ) || !IsValid( ply ) ) then return end
 
 	local trace = ply:GetEyeTrace()
@@ -354,6 +384,7 @@ function TOOL:UpdateGhostEntity( ent, ply )
 	end
 
 	ent:SetNoDraw( false )
+
 end
 
 function TOOL:MakeGhostEntity( model, pos, angle )

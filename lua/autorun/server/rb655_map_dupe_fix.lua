@@ -23,7 +23,7 @@ hook.Add( "EntityKeyValue", "rb655_keyval_fix", function( ent, key, val )
 
 	elseif ( ent:GetClass() == "prop_door_rotating" ) then
 
-		if ( !ent.rb655_dupe_data ) then ent.rb655_dupe_data = {} end
+		if ( !ent.rb655_dupe_data ) then ent.rb655_dupe_data = { ismapcreated = ent:CreatedByMap() } end
 
 		if ( key == "speed" ) then ent.rb655_dupe_data.speed = val end
 		if ( key == "distance" ) then ent.rb655_dupe_data.distance = val end
@@ -35,6 +35,7 @@ hook.Add( "EntityKeyValue", "rb655_keyval_fix", function( ent, key, val )
 		if ( key == "spawnflags" ) then ent.rb655_dupe_data.spawnflags = val end
 		if ( key == "spawnpos" ) then ent.rb655_dupe_data.spawnpos = val end
 		if ( key == "targetname" ) then ent.rb655_dupe_data.targetname = val end
+		--if ( key == "slavename" ) then print( "slavename", key, val ) ent.rb655_dupe_data.targetname = val end
 
 	elseif ( ent:GetClass() == "item_ammo_crate" ) then
 

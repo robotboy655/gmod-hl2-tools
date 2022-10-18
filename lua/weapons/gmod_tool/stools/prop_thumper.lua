@@ -123,7 +123,7 @@ function TOOL:UpdateGhostEntity( ent, ply )
 
 	local trace = ply:GetEyeTrace()
 
-	if ( !trace.Hit || trace.HitNormal.z < 0.98 || trace.Entity && ( trace.Entity:GetClass() == "prop_thumper" || trace.Entity:IsPlayer() || trace.Entity:IsNPC() ) ) then
+	if ( !trace.Hit || trace.HitNormal.z < 0.98 || IsValid( trace.Entity ) && ( trace.Entity:GetClass() == "prop_thumper" || trace.Entity:IsPlayer() || trace.Entity:IsNPC() ) ) then
 		ent:SetNoDraw( true )
 		return
 	end

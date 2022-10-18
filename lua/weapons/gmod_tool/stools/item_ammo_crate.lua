@@ -94,7 +94,7 @@ function TOOL:UpdateGhostEntity( ent, ply )
 	local trace = ply:GetEyeTrace()
 
 	if ( !trace.Hit || trace.HitNormal.z < 0.7 ) then ent:SetNoDraw( true ) return end
-	if ( trace.Entity && ( trace.Entity:GetClass() == "item_ammo_crate" || trace.Entity:IsPlayer() ) ) then ent:SetNoDraw( true ) return end
+	if ( IsValid( trace.Entity ) && ( trace.Entity:GetClass() == "item_ammo_crate" || trace.Entity:IsPlayer() ) ) then ent:SetNoDraw( true ) return end
 
 	local ang = trace.HitNormal:Angle()
 	ang.p = ang.p - 270

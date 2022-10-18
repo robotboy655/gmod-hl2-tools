@@ -1,0 +1,5 @@
+"VertexLitGeneric"
+{
+	"$basetexture"	"models/items/ammocrate_r357"
+	"$surfaceprop"	"metal"
+}

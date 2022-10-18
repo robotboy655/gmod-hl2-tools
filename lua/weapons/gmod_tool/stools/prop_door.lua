@@ -236,18 +236,7 @@ if ( SERVER ) then
 		numpad.OnDown( ply, keyLock, "prop_door_lock", prop_door_dynamic )
 		numpad.OnDown( ply, keyUnlock, "prop_door_unlock", prop_door_dynamic )
 
-		--[[table.Merge( prop_door_dynamic:GetTable(), {
-			ply = ply,
-			keyOpen = keyOpen,
-			keyClose = keyClose,
-			keyLock = keyLock,
-			keyUnlock = keyUnlock,
-			auto_close_delay = auto_close_delay,
-			skin = skin
-		} )]]
-
-		-- This shit is needed because we are using a proxy entity for dynamic doors
-		table.Merge( prop_door_dynamic.door:GetTable(), {
+		table.Merge( prop_door_dynamic:GetTable(), {
 			ply = ply,
 			keyOpen = keyOpen,
 			keyClose = keyClose,
@@ -265,7 +254,7 @@ if ( SERVER ) then
 		DoPropSpawnedEffect( prop_door_dynamic )
 
 		if ( Wire_CreateOutputs ) then
-			local door = prop_door_dynamic.door
+			local door = prop_door_dynamic
 			--door.Outputs = Wire_CreateOutputs( door, { "OnClosed", "OnOpened", "OnLocked", "OnUnlocked" } )
 			door.Inputs = Wire_CreateInputs( door, { "Open", "Lock" } )
 

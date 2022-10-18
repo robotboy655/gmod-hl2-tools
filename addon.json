@@ -5,6 +5,9 @@
 	"ignore"	:
 	[
 		"*.txt",
+		".git*",
+		"*.bat",
+		"*.md",
 		"models/items/*_backup.mdl"
 	]
 }

@@ -423,20 +423,23 @@ if ( IsMounted( "portal2" ) ) then
 	list.Set( "DoorModels", "models/props/portal_door_combined.mdl", { prop_door_type = 0 } )
 end
 
-if ( IsMounted( "left4dead2" ) ) then
+if ( IsMounted( "left4dead2" ) || IsMounted( "left4dead" ) ) then
 	list.Set( "DoorModels", "models/props_doors/doormainmetal01.mdl", { prop_door_type = 7 } )
 	list.Set( "DoorModels", "models/props_doors/doormainmetalsmall01.mdl", { prop_door_type = 1 } )
 
-	list.Set( "DoorModels", "models/props_downtown/door_interior_112_01.mdl", { prop_door_type = 1 } )
-	list.Set( "DoorModels", "models/props_downtown/door_interior_128_01.mdl", { prop_door_type = 1 } )
 	list.Set( "DoorModels", "models/props_doors/doorfreezer01.mdl", { prop_door_type = 6 } )
 
 	list.Set( "DoorModels", "models/props_doors/doormainmetalwindow01.mdl", { prop_door_type = 10 } )
 	list.Set( "DoorModels", "models/props_doors/doormainmetalwindowsmall01.mdl", { prop_door_type = 1 } )
 
-	list.Set( "DoorModels", "models/props_doors/doorglassmain01.mdl", { prop_door_type = 10 } )
-	list.Set( "DoorModels", "models/props_doors/doorglassmain01_small.mdl", { prop_door_type = 10 } )
+	list.Set( "DoorModels", "models/props_doors/doormain01.mdl", { prop_door_type = 1 } )
+	list.Set( "DoorModels", "models/props_doors/doormain01_airport.mdl", { prop_door_type = 7 } )
+	list.Set( "DoorModels", "models/props_doors/doormain01_airport_small.mdl", { prop_door_type = 8 } )
+	list.Set( "DoorModels", "models/props_doors/doormain01_small.mdl", { prop_door_type = 9 } )
+end
 
+if ( IsMounted( "left4dead2" ) ) then
+	list.Set( "DoorModels", "models/props_downtown/door_interior_128_01.mdl", { prop_door_type = 1 } )
 	list.Set( "DoorModels", "models/props_downtown/metal_door_112.mdl", { prop_door_type = 1 } )
 	list.Set( "DoorModels", "models/props_doors/door_rotate_112.mdl", { prop_door_type = 1 } )
 	list.Set( "DoorModels", "models/props_doors/door_sliding_112.mdl", { prop_door_type = 1 } )
@@ -448,13 +451,17 @@ if ( IsMounted( "left4dead2" ) ) then
 	list.Set( "DoorModels", "models/props_doors/checkpoint_door_02.mdl", { prop_door_type = 5 } )
 
 	-- Wood
-	list.Set( "DoorModels", "models/props_doors/doormain01.mdl", { prop_door_type = 1 } )
-	list.Set( "DoorModels", "models/props_doors/doormain01_airport.mdl", { prop_door_type = 7 } )
-	list.Set( "DoorModels", "models/props_doors/doormain01_airport_small.mdl", { prop_door_type = 8 } )
-	list.Set( "DoorModels", "models/props_doors/doormain01_small.mdl", { prop_door_type = 9 } )
 	list.Set( "DoorModels", "models/props_doors/doormain_rural01.mdl", { prop_door_type = 9 } )
 	list.Set( "DoorModels", "models/props_doors/doormain_rural01_small.mdl", { prop_door_type = 9 } )
+end
 
+if ( IsMounted( "left4dead2" ) || IsMounted( "csgo" ) ) then
+	list.Set( "DoorModels", "models/props_downtown/door_interior_112_01.mdl", { prop_door_type = 1 } )
+	list.Set( "DoorModels", "models/props_downtown/metal_door_112.mdl", { prop_door_type = 1 } )
+end
+if ( IsMounted( "left4dead2" ) || IsMounted( "left4dead" ) || IsMounted( "csgo" ) ) then
+	list.Set( "DoorModels", "models/props_doors/doorglassmain01.mdl", { prop_door_type = 10 } )
+	list.Set( "DoorModels", "models/props_doors/doorglassmain01_small.mdl", { prop_door_type = 10 } )
 end
 
 if ( IsMounted( "ep2" ) ) then

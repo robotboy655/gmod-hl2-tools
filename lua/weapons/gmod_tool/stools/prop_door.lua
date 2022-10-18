@@ -20,6 +20,7 @@ TOOL.ClientConVar[ "r_double" ] = "0"
 TOOL.ClientConVar[ "r_hardware" ] = "1"
 TOOL.ClientConVar[ "r_distance" ] = "90"
 TOOL.ClientConVar[ "r_speed" ] = "100"
+TOOL.ClientConVar[ "breakable" ] = "0"
 
 local gDoorUniqueID = 0
 
@@ -113,7 +114,7 @@ if ( SERVER ) then
 		return input
 	end
 
-	function MakeDoorRotating( ply, model, pos, ang, _oSkin, keyOpen, keyClose, keyLock, keyUnlock, _oHardware, _oDistance, _oSpeed, _oReturnDelay, _oTargetName, data )
+	function MakeDoorRotating( ply, model, pos, ang, _oSkin, keyOpen, keyClose, keyLock, keyUnlock, _oHardware, _oDistance, _oSpeed, _oReturnDelay, breakable, _oTargetName, data )
 
 		if ( IsValid( ply ) && !ply:CheckLimit( "prop_doors" ) ) then return nil end
 
@@ -174,6 +175,8 @@ if ( SERVER ) then
 
 		prop_door_rotating:SetSkin( skin )
 
+		if ( breakable ) then prop_door_rotating:Fire( "SetBreakable" ) end
+
 		numpad.OnDown( ply, keyOpen, "prop_door_open", prop_door_rotating )
 		numpad.OnDown( ply, keyClose, "prop_door_close", prop_door_rotating )
 		numpad.OnDown( ply, keyLock, "prop_door_lock", prop_door_rotating )
@@ -185,6 +188,7 @@ if ( SERVER ) then
 			keyClose = keyClose,
 			keyLock = keyLock,
 			keyUnlock = keyUnlock,
+			breakable = breakable,
 
 			rb655_dupe_data = {
 				spawnflags = spawnflags,
@@ -233,7 +237,7 @@ if ( SERVER ) then
 		return prop_door_rotating
 
 	end
-	duplicator.RegisterEntityClass( "prop_door_rotating", MakeDoorRotating, "model", "pos", "ang", "skin", "keyOpen", "keyClose", "keyLock", "keyUnlock", "rHardware", "rDistance", "rSpeed", "auto_close_delay", "targetname", "rb655_dupe_data" )
+	duplicator.RegisterEntityClass( "prop_door_rotating", MakeDoorRotating, "model", "pos", "ang", "skin", "keyOpen", "keyClose", "keyLock", "keyUnlock", "rHardware", "rDistance", "rSpeed", "auto_close_delay", "breakable", "targetname", "rb655_dupe_data" )
 
 	function MakeDoorDynamic( ply, model, pos, ang, keyOpen, keyClose, keyLock, keyUnlock, auto_close_delay, skin )
 
@@ -317,6 +321,7 @@ function TOOL:LeftClick( trace )
 	local rH = math.Clamp( self:GetClientNumber( "r_hardware" ), 1, 3 )
 	local rD = self:GetClientNumber( "r_distance" )
 	local rS = self:GetClientNumber( "r_speed" )
+	local breakable = self:GetClientNumber( "breakable", 0 ) > 0
 
 	local prop_door
 	local prop_door2
@@ -332,7 +337,7 @@ function TOOL:LeftClick( trace )
 		prop_door.door:Fire( "SetAnimation", "idleclosed" )
 		prop_door.door:Fire( "SetAnimation", "idle" )]]
 	else
-		prop_door = MakeDoorRotating( ply, mdl, trace.HitPos, ang, doorSkin, kO, kC, kL, kU, rH, rD, rS, auto_close_delay )
+		prop_door = MakeDoorRotating( ply, mdl, trace.HitPos, ang, doorSkin, kO, kC, kL, kU, rH, rD, rS, auto_close_delay, breakable )
 		self:FixRotatingPos( prop_door )
 
 		if ( self:GetClientNumber( "r_double" ) == 1 ) then
@@ -342,7 +347,7 @@ function TOOL:LeftClick( trace )
 			local name = "rb655_door_" .. gDoorUniqueID
 			gDoorUniqueID = gDoorUniqueID + 1
 
-			prop_door2 = MakeDoorRotating( ply, mdl, trace.HitPos, ang2, doorSkin, kO, kC, kL, kU, rH, rD, rS, auto_close_delay, name )
+			prop_door2 = MakeDoorRotating( ply, mdl, trace.HitPos, ang2, doorSkin, kO, kC, kL, kU, rH, rD, rS, auto_close_delay, breakable, name )
 			prop_door:SetKeyValue( "targetname", name )
 			prop_door.rb655_dupe_data.targetname = name
 
@@ -523,6 +528,7 @@ language.Add( "tool.prop_door.skin", "Door skin:" )
 language.Add( "tool.prop_door.specific", "Door specific options" )
 
 language.Add( "tool.prop_door.r_double", "Make double doors" )
+language.Add( "tool.prop_door.breakable", "Make breakable (if model supports it)" )
 language.Add( "tool.prop_door.r_hardware", "Hardware Type" )
 language.Add( "tool.prop_door.r_distance", "Rotation distance:" )
 language.Add( "tool.prop_door.r_speed", "Open speed:" )
@@ -572,6 +578,8 @@ function TOOL.BuildCPanel( panel )
 	if ( typ == 0 ) then return end
 
 	panel:AddControl( "Checkbox", { Label = "#tool.prop_door.r_double", Command = "prop_door_r_double" } )
+
+	panel:AddControl( "Checkbox", { Label = "#tool.prop_door.breakable", Command = "prop_door_breakable" } )
 
 	local r_hard = GetConVarNumber( "prop_door_r_hardware" )
 	if ( ( typ != 3 && r_hard == 3 ) || ( typ == 2 && r_hard != 1 ) ) then LocalPlayer():ConCommand( "prop_door_r_hardware 1" ) end

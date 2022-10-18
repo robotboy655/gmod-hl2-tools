@@ -1,0 +1,10 @@
+{
+	"title"		:	"Half-Life 2 Tools",
+	"type"		:	"Tool",
+	"tags"		:	[ "fun", "scenic" ],
+	"ignore"	:
+	[
+		"*.txt",
+		"models/items/*_backup.mdl"
+	]
+}

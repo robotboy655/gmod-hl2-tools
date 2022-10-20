@@ -159,8 +159,14 @@ function ENT:Think()
 
 end
 
-function ENT:Draw()
+function ENT:Draw( flags )
 
-	self:DrawModel()
+	self:DrawModel( flags )
+
+end
+
+function ENT:DrawTranslucent( flags )
+
+	self:Draw( flags )
 
 end

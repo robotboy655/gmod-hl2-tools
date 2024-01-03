@@ -42,7 +42,7 @@ end
 
 function ENT:Open()
 
-	if ( self.NextToggle > CurTime() || self.Locked || self.Opened == true ) then return end
+	if ( self.NextToggle > CurTime() or self.Locked or self.Opened == true ) then return end
 
 	self:PlayAnimation( "Open" )
 
@@ -50,7 +50,7 @@ function ENT:Open()
 	if ( model == "models/props_mining/elevator01_cagedoor.mdl" ) then
 		self:EmitSound( "ambient/levels/outland/ol04elevatorgate_up.wav" )
 	end
-	if ( model == "models/props_mining/techgate01.mdl" || model == "models/props_mining/techgate01_outland03.mdl" ) then
+	if ( model == "models/props_mining/techgate01.mdl" or model == "models/props_mining/techgate01_outland03.mdl" ) then
 		self:EmitSound( "ambient/levels/outland/ol03_slidingoverhead_open.wav" )
 	end
 	if ( model == "models/props_lab/elevatordoor.mdl" ) then
@@ -83,7 +83,7 @@ end
 
 function ENT:Close()
 
-	if ( self.NextToggle > CurTime() || self.Locked || self.Opened == false ) then return end
+	if ( self.NextToggle > CurTime() or self.Locked or self.Opened == false ) then return end
 
 	timer.Remove( "rb655_door_autoclose_" .. self:EntIndex() )
 
@@ -93,7 +93,7 @@ function ENT:Close()
 	if ( model == "models/props_mining/elevator01_cagedoor.mdl" ) then
 		self:EmitSound( "ambient/levels/outland/ol01a_gate_open.wav" )
 	end
-	if ( model == "models/props_mining/techgate01.mdl" || model == "models/props_mining/techgate01_outland03.mdl" ) then
+	if ( model == "models/props_mining/techgate01.mdl" or model == "models/props_mining/techgate01_outland03.mdl" ) then
 		self:EmitSound( "ambient/levels/outland/ol03_slidingoverhead_open.wav" )
 	end
 	if ( model == "models/props_lab/elevatordoor.mdl" ) then
@@ -136,9 +136,9 @@ function ENT:AcceptInput( name, activator, caller, data )
 
 	name = string.lower( name )
 
-	if ( name == "open" && self.NextToggle < CurTime() && !self.Locked && self.Opened == false ) then
+	if ( name == "open" and self.NextToggle < CurTime() and !self.Locked and self.Opened == false ) then
 		self:Open()
-	elseif ( name == "close" && self.NextToggle < CurTime() && !self.Locked && self.Opened == true ) then
+	elseif ( name == "close" and self.NextToggle < CurTime() and !self.Locked and self.Opened == true ) then
 		self:Close()
 	elseif ( name == "lock" ) then
 		self.Locked = true
@@ -152,7 +152,7 @@ function ENT:Think()
 
 	if ( SERVER ) then
 		self:UpdateBoneFollowers()
-	
+
 		self:NextThink( CurTime() )
 		return true
 	end

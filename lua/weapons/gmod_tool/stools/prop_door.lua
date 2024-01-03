@@ -52,7 +52,7 @@ function TOOL:FixDynamicPos( mdl, pos, ang, minz )
 	if ( mdl == "models/props_combine/combine_door01.mdl" ) then
 		ang:RotateAroundAxis( Vector( 0, 0, 1 ), -90 )
 	end
-	if ( mdl == "models/props_mining/techgate01.mdl" || mdl == "models/props_mining/techgate01_outland03.mdl" ) then
+	if ( mdl == "models/props_mining/techgate01.mdl" or mdl == "models/props_mining/techgate01_outland03.mdl" ) then
 		ang:RotateAroundAxis( Vector( 0, 0, 1 ), -90 )
 		pos = pos - ent:GetRight() * 80
 	end
@@ -78,7 +78,7 @@ function TOOL:FixRotatingPos( ent )
 	local typ = self:GetClientNumber( "type" )
 	local doubl = self:GetClientNumber( "r_double" ) + 1
 
-	if ( typ == 1 || typ == 3 ) then pos = pos + ent:GetRight() * ( max.y / 2.01 ) * doubl end
+	if ( typ == 1 or typ == 3 ) then pos = pos + ent:GetRight() * ( max.y / 2.01 ) * doubl end
 	if ( typ == 2 ) then pos = pos + ent:GetRight() * ( max.y / 3.1 ) * doubl end
 
 	-- L4D2 doors
@@ -96,13 +96,13 @@ function TOOL:FixRotatingPos( ent )
 end
 
 if ( SERVER ) then
-	CreateConVar( "sbox_maxprop_doors", 10 )
+	CreateConVar( "sbox_maxprop_doors", 10, FCVAR_ARCHIVE + FCVAR_REPLICATED + FCVAR_NOTIFY )
 
 	numpad.Register( "prop_door_open", function( ply, prop_door ) if ( !IsValid( prop_door ) ) then return false end prop_door:Fire( "Open" ) end )
 	numpad.Register( "prop_door_close", function( ply, prop_door ) if ( !IsValid( prop_door ) ) then return false end prop_door:Fire( "Close" ) end )
 	numpad.Register( "prop_door_lock", function( ply, prop_door ) if ( !IsValid( prop_door ) ) then return false end prop_door:Fire( "Lock" ) end )
 	numpad.Register( "prop_door_unlock", function( ply, prop_door ) if ( !IsValid( prop_door ) ) then return false end prop_door:Fire( "Unlock" ) end )
-	
+
 	function EnsureNameIsUnique( input )
 		local doors = ents.FindByName( input )
 		if ( #doors > 1 ) then
@@ -110,51 +110,51 @@ if ( SERVER ) then
 			-- Could probably use a while loop here...
 			return EnsureNameIsUnique( input .. "_2" )
 		end
-		
+
 		return input
 	end
 
 	function MakeDoorRotating( ply, model, pos, ang, _oSkin, keyOpen, keyClose, keyLock, keyUnlock, _oHardware, _oDistance, _oSpeed, _oReturnDelay, breakable, _oTargetName, data )
 
-		if ( IsValid( ply ) && !ply:CheckLimit( "prop_doors" ) ) then return nil end
+		if ( IsValid( ply ) and !ply:CheckLimit( "prop_doors" ) ) then return nil end
 
 		local prop_door_rotating = ents.Create( "prop_door_rotating" )
 		if ( !IsValid( prop_door_rotating ) ) then return false end
 
 		prop_door_rotating:SetModel( model )
 		prop_door_rotating:SetPos( pos )
-		
-		if ( data && data.initialAngles ) then ang = data.initialAngles end
+
+		if ( data and data.initialAngles ) then ang = data.initialAngles end
 		prop_door_rotating:SetAngles( ang )
 
-		keyOpen = keyOpen || -1
-		keyClose = keyClose || -1
-		keyLock = keyLock || -1
-		keyUnlock = keyUnlock || -1
+		keyOpen = keyOpen or -1
+		keyClose = keyClose or -1
+		keyLock = keyLock or -1
+		keyUnlock = keyUnlock or -1
 
-		local targetname = _oTargetName || ""
-		if ( data && data.targetname ) then targetname = data.targetname end
-		local hardware = _oHardware || 1
-		if ( data && data.hardware ) then hardware = data.hardware end
-		local distance = _oDistance || 90
-		if ( data && data.distance ) then distance = data.distance end
-		local speed = _oSpeed || 100
-		if ( data && data.speed ) then speed = data.speed end
-		local returndelay = _oReturnDelay || 4
-		if ( data && data.returndelay ) then returndelay = data.returndelay end
-		local skin = _oSkin || 0
-		if ( data && data.skin ) then skin = data.skin end
+		local targetname = _oTargetName or ""
+		if ( data and data.targetname ) then targetname = data.targetname end
+		local hardware = _oHardware or 1
+		if ( data and data.hardware ) then hardware = data.hardware end
+		local distance = _oDistance or 90
+		if ( data and data.distance ) then distance = data.distance end
+		local speed = _oSpeed or 100
+		if ( data and data.speed ) then speed = data.speed end
+		local returndelay = _oReturnDelay or 4
+		if ( data and data.returndelay ) then returndelay = data.returndelay end
+		local skin = _oSkin or 0
+		if ( data and data.skin ) then skin = data.skin end
 
 		local spawnflags = 8192
-		--if ( data && data.spawnflags ) then spawnflags = data.spawnflags end
+		--if ( data and data.spawnflags ) then spawnflags = data.spawnflags end
 		local ajarangles
-		if ( data && data.ajarangles ) then ajarangles = data.ajarangles end
+		if ( data and data.ajarangles ) then ajarangles = data.ajarangles end
 		local axis
-		if ( data && data.axis ) then axis = data.axis end
+		if ( data and data.axis ) then axis = data.axis end
 		local spawnpos
-		if ( data && data.spawnpos ) then spawnpos = data.spawnpos end
+		if ( data and data.spawnpos ) then spawnpos = data.spawnpos end
 
-		if ( targetname && targetname:len() > 0 ) then
+		if ( targetname and targetname:len() > 0 ) then
 			-- We gotta make sure there are no more than 2 doors with the same name, because only 2 can be linked at a time.
 			targetname = EnsureNameIsUnique( targetname )
 
@@ -227,8 +227,8 @@ if ( SERVER ) then
 			prop_door_rotating.Inputs = Wire_CreateInputs( prop_door_rotating, { "Open", "Lock" } )
 
 			function prop_door_rotating:TriggerInput( name, value )
-				if ( name == "Open" ) then self:Fire( value != 0 && "Open" || "Close" ) end
-				if ( name == "Lock" ) then self:Fire( value != 0 && "Lock" || "Unlock" ) end
+				if ( name == "Open" ) then self:Fire( value != 0 and "Open" or "Close" ) end
+				if ( name == "Lock" ) then self:Fire( value != 0 and "Lock" or "Unlock" ) end
 			end
 		end
 
@@ -241,7 +241,7 @@ if ( SERVER ) then
 
 	function MakeDoorDynamic( ply, model, pos, ang, keyOpen, keyClose, keyLock, keyUnlock, auto_close_delay, skin )
 
-		if ( IsValid( ply ) && !ply:CheckLimit( "prop_doors" ) ) then return false end
+		if ( IsValid( ply ) and !ply:CheckLimit( "prop_doors" ) ) then return false end
 
 		local prop_door_dynamic = ents.Create( "prop_door_dynamic" )
 		if ( !IsValid( prop_door_dynamic ) ) then return false end
@@ -253,7 +253,7 @@ if ( SERVER ) then
 		prop_door_dynamic:Spawn()
 		prop_door_dynamic:Activate()
 
-		prop_door_dynamic:SetSkin( skin || 0 )
+		prop_door_dynamic:SetSkin( skin or 0 )
 		prop_door_dynamic:SetCloseDelay( auto_close_delay )
 
 		numpad.OnDown( ply, keyOpen, "prop_door_open", prop_door_dynamic )
@@ -285,8 +285,8 @@ if ( SERVER ) then
 
 			function door:TriggerInput( name, value ) if ( self.RB655_Prop_Door_Dynamic ) then return self.RB655_Prop_Door_Dynamic:TriggerInput( name, value ) end end
 			function prop_door_dynamic:TriggerInput( name, value )
-				if ( name == "Open" ) then self:Fire( value != 0 && "Open" || "Close" ) end
-				if ( name == "Lock" ) then self:Fire( value != 0 && "Lock" || "Unlock" ) end
+				if ( name == "Open" ) then self:Fire( value != 0 and "Open" or "Close" ) end
+				if ( name == "Lock" ) then self:Fire( value != 0 and "Lock" or "Unlock" ) end
 			end
 		end
 
@@ -299,7 +299,7 @@ end
 
 function TOOL:LeftClick( trace )
 
-	if ( trace.HitSky || !trace.HitPos ) then return false end
+	if ( trace.HitSky or !trace.HitPos ) then return false end
 	if ( IsValid( trace.Entity ) ) then return false end
 	if ( CLIENT ) then return true end
 
@@ -367,11 +367,11 @@ end
 
 function TOOL:UpdateGhostEntity( ent, ply )
 
-	if ( !IsValid( ent ) || !IsValid( ply ) ) then return end
+	if ( !IsValid( ent ) or !IsValid( ply ) ) then return end
 
 	local trace = ply:GetEyeTrace()
 
-	if ( IsValid( trace.Entity ) || !trace.Hit ) then ent:SetNoDraw( true ) return end
+	if ( IsValid( trace.Entity ) or !trace.Hit ) then ent:SetNoDraw( true ) return end
 
 	ent:SetPos( trace.HitPos )
 	ent:SetAngles( Angle( 0, ply:GetAngles().y, 0 ) )
@@ -395,8 +395,8 @@ end
 function TOOL:MakeGhostEntity( model, pos, angle )
 	util.PrecacheModel( model )
 
-	if ( SERVER && !game.SinglePlayer() ) then return end -- We do ghosting serverside in single player
-	if ( CLIENT && game.SinglePlayer() ) then return end -- It's done clientside in multiplayer
+	if ( SERVER and !game.SinglePlayer() ) then return end -- We do ghosting serverside in single player
+	if ( CLIENT and game.SinglePlayer() ) then return end -- It's done clientside in multiplayer
 
 	self:ReleaseGhostEntity() -- Release the old ghost entity
 
@@ -421,12 +421,12 @@ end
 
 local OldMDL = GetConVarString( "prop_door_model" )
 function TOOL:Think()
-	if ( CLIENT && OldMDL != GetConVarString( "prop_door_model" ) ) then
+	if ( CLIENT and OldMDL != GetConVarString( "prop_door_model" ) ) then
 		OldMDL = GetConVarString( "prop_door_model" )
-		if ( LocalPlayer():GetTool() && LocalPlayer():GetTool( "prop_door" ) ) then LocalPlayer():GetTool():UpdateControlPanel() end
+		if ( LocalPlayer():GetTool() and LocalPlayer():GetTool( "prop_door" ) ) then LocalPlayer():GetTool():UpdateControlPanel() end
 	end
 
-	if ( !IsValid( self.GhostEntity ) || self.GhostEntity:GetModel() != self:GetClientInfo( "model" ) ) then
+	if ( !IsValid( self.GhostEntity ) or self.GhostEntity:GetModel() != self:GetClientInfo( "model" ) ) then
 		self:MakeGhostEntity( self:GetClientInfo( "model" ), Vector( 0, 0, 0 ), Angle( 0, 0, 0 ) )
 	end
 	self:UpdateGhostEntity( self.GhostEntity, self:GetOwner() )
@@ -459,7 +459,7 @@ if ( IsMounted( "portal2" ) ) then
 	list.Set( "DoorModels", "models/props/portal_door_combined.mdl", { prop_door_type = 0 } )
 end
 
-if ( IsMounted( "left4dead2" ) || IsMounted( "left4dead" ) ) then
+if ( IsMounted( "left4dead2" ) or IsMounted( "left4dead" ) ) then
 	list.Set( "DoorModels", "models/props_doors/doormainmetal01.mdl", { prop_door_type = 7 } )
 	list.Set( "DoorModels", "models/props_doors/doormainmetalsmall01.mdl", { prop_door_type = 1 } )
 
@@ -491,11 +491,11 @@ if ( IsMounted( "left4dead2" ) ) then
 	list.Set( "DoorModels", "models/props_doors/doormain_rural01_small.mdl", { prop_door_type = 9 } )
 end
 
-if ( IsMounted( "left4dead2" ) || IsMounted( "csgo" ) ) then
+if ( IsMounted( "left4dead2" ) or IsMounted( "csgo" ) ) then
 	list.Set( "DoorModels", "models/props_downtown/door_interior_112_01.mdl", { prop_door_type = 1 } )
 	list.Set( "DoorModels", "models/props_downtown/metal_door_112.mdl", { prop_door_type = 1 } )
 end
-if ( IsMounted( "left4dead2" ) || IsMounted( "left4dead" ) || IsMounted( "csgo" ) ) then
+if ( IsMounted( "left4dead2" ) or IsMounted( "left4dead" ) or IsMounted( "csgo" ) ) then
 	list.Set( "DoorModels", "models/props_doors/doorglassmain01.mdl", { prop_door_type = 10 } )
 	list.Set( "DoorModels", "models/props_doors/doorglassmain01_small.mdl", { prop_door_type = 10 } )
 end
@@ -567,7 +567,7 @@ function TOOL.BuildCPanel( panel )
 	local typ = GetConVarNumber( "prop_door_type" )
 	local numSkins = NumModelSkins( GetConVarString( "prop_door_model" ) )
 
-	if ( typ == 0 && numSkins <= 1 ) then return end
+	if ( typ == 0 and numSkins <= 1 ) then return end
 
 	panel:Help( "#tool.prop_door.specific" )
 
@@ -582,7 +582,7 @@ function TOOL.BuildCPanel( panel )
 	panel:AddControl( "Checkbox", { Label = "#tool.prop_door.breakable", Command = "prop_door_breakable" } )
 
 	local r_hard = GetConVarNumber( "prop_door_r_hardware" )
-	if ( ( typ != 3 && r_hard == 3 ) || ( typ == 2 && r_hard != 1 ) ) then LocalPlayer():ConCommand( "prop_door_r_hardware 1" ) end
+	if ( ( typ != 3 and r_hard == 3 ) or ( typ == 2 and r_hard != 1 ) ) then LocalPlayer():ConCommand( "prop_door_r_hardware 1" ) end
 
 	local r_hardware = {
 		["#tool.prop_door.lever"] = { prop_door_r_hardware = "1" },

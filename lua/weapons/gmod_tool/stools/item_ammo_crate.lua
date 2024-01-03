@@ -21,19 +21,18 @@ cleanup.Register( "item_ammo_crates" )
 
 if ( SERVER ) then
 
-	CreateConVar( "rb655_force_downloads", "0", FCVAR_ARCHIVE )
-
-	if ( GetConVarNumber( "rb655_force_downloads" ) > 0 ) then
+	local rb655_force_downloads = CreateConVar( "rb655_force_downloads", "0", FCVAR_ARCHIVE )
+	if ( rb655_force_downloads:GetFloat() > 0 ) then
 
 		resource.AddFile( "models/items/ammocrate_357.mdl" )
 		resource.AddFile( "models/items/ammocrate_crossbow.mdl" )
 
 	end
 
-	CreateConVar( "sbox_maxitem_ammo_crates", 10 )
+	CreateConVar( "sbox_maxitem_ammo_crates", 10, FCVAR_ARCHIVE + FCVAR_REPLICATED + FCVAR_NOTIFY )
 
 	function MakeAmmoCrate( ply, model, pos, ang, type )
-		if ( IsValid( ply ) && !ply:CheckLimit( "item_ammo_crates" ) ) then return nil end
+		if ( IsValid( ply ) and !ply:CheckLimit( "item_ammo_crates" ) ) then return nil end
 
 		type = tonumber( type ) or 0
 
@@ -93,8 +92,8 @@ function TOOL:UpdateGhostEntity( ent, ply )
 
 	local trace = ply:GetEyeTrace()
 
-	if ( !trace.Hit || trace.HitNormal.z < 0.7 ) then ent:SetNoDraw( true ) return end
-	if ( IsValid( trace.Entity ) && ( trace.Entity:GetClass() == "item_ammo_crate" || trace.Entity:IsPlayer() ) ) then ent:SetNoDraw( true ) return end
+	if ( !trace.Hit or trace.HitNormal.z < 0.7 ) then ent:SetNoDraw( true ) return end
+	if ( IsValid( trace.Entity ) and ( trace.Entity:GetClass() == "item_ammo_crate" or trace.Entity:IsPlayer() ) ) then ent:SetNoDraw( true ) return end
 
 	local ang = trace.HitNormal:Angle()
 	ang.p = ang.p - 270
@@ -108,7 +107,7 @@ function TOOL:UpdateGhostEntity( ent, ply )
 end
 
 function TOOL:Think()
-	if ( !IsValid( self.GhostEntity ) || self.GhostEntity:GetModel() != ToolModels[ self:GetClientNumber( "type" ) ] ) then
+	if ( !IsValid( self.GhostEntity ) or self.GhostEntity:GetModel() != ToolModels[ self:GetClientNumber( "type" ) ] ) then
 		self:MakeGhostEntity( ToolModels[ self:GetClientNumber( "type" ) ], Vector( 0, 0, 0 ), Angle( 0, 0, 0 ) )
 	end
 	self:UpdateGhostEntity( self.GhostEntity, self:GetOwner() )

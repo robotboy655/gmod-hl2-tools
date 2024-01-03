@@ -60,7 +60,7 @@ function TOOL:LeftClick( trace )
 
 	local entry = self:GetSelectedEntry()
 	if ( !entry ) then return false end
-	
+
 	if ( IsValid( trace.Entity ) and trace.Entity:GetClass() == entry.classname ) then return false end
 	if ( CLIENT ) then return true end
 
@@ -93,7 +93,7 @@ function TOOL:Think()
 		return
 	end
 
-	if ( !IsValid( self.GhostEntity ) || self.GhostEntity:GetModel() != entry.model ) then
+	if ( !IsValid( self.GhostEntity ) or self.GhostEntity:GetModel() != entry.model ) then
 		self:MakeGhostEntity( entry.model, Vector( 0, 0, 0 ), Angle( 0, 0, 0 ) )
 	end
 
@@ -107,7 +107,7 @@ function TOOL:UpdateGhostEntity( ent, ply, entry )
 
 	local trace = ply:GetEyeTrace()
 
-	if ( !trace.Hit || !entry ) then ent:SetNoDraw( true ) return end
+	if ( !trace.Hit or !entry ) then ent:SetNoDraw( true ) return end
 	if ( IsValid( trace.Entity ) and ( trace.Entity:GetClass() == entry.classname or trace.Entity:IsPlayer() or trace.Entity:IsNPC() ) ) then ent:SetNoDraw( true ) return end
 
 	ent:SetPos( trace.HitPos )

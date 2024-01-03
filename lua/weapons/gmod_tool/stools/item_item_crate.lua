@@ -27,10 +27,10 @@ TOOL.ClientConVar[ "desired_ar2_alt" ] = "0"
 cleanup.Register( "item_item_crates" )
 
 if ( SERVER ) then
-	CreateConVar( "sbox_maxitem_item_crates", 8 )
+	CreateConVar( "sbox_maxitem_item_crates", 8, FCVAR_ARCHIVE + FCVAR_REPLICATED + FCVAR_NOTIFY )
 
 	function MakeItemCrate( ply, pos, ang, appearance, class, amount, health, dynamic_values )
-		if ( IsValid( ply ) && !ply:CheckLimit( "item_item_crates" ) ) then return nil end
+		if ( IsValid( ply ) and !ply:CheckLimit( "item_item_crates" ) ) then return nil end
 
 		local item_item_crate = ents.Create( "item_item_crate" )
 		if ( !IsValid( item_item_crate ) ) then return false end
@@ -38,10 +38,10 @@ if ( SERVER ) then
 		item_item_crate:SetAngles( ang )
 
 		-- Map placed entity fix
-		class = class || "item_dynamic_ressuply"
-		appearance = appearance || 0
-		amount = tonumber( amount ) || 1
-		dynamic_values = dynamic_values || {}
+		class = class or "item_dynamic_ressuply"
+		appearance = appearance or 0
+		amount = tonumber( amount ) or 1
+		dynamic_values = dynamic_values or {}
 
 		if ( class == "item_dynamic_resupply" ) then
 			local item_dynamic_resupply = ents.Create( "item_dynamic_resupply" )
@@ -62,7 +62,7 @@ if ( SERVER ) then
 
 		if ( health ) then item_item_crate:Fire( "SetHealth", math.Clamp( health, 1, 100 ) ) end
 
-		if ( appearance && appearance == 1 ) then -- Episode 2 Jalopy radar thingy
+		if ( appearance and appearance == 1 ) then -- Episode 2 Jalopy radar thingy
 			local t = ents.Create( "info_radar_target" )
 			t:SetPos( item_item_crate:GetPos() )
 			t:SetKeyValue( "mode", 0 )
@@ -97,7 +97,7 @@ if ( SERVER ) then
 end
 
 function TOOL:LeftClick( trace )
-	if ( trace.HitSky || !trace.HitPos || IsValid( trace.Entity ) && ( trace.Entity:IsPlayer() || trace.Entity:IsNPC() ) ) then return false end
+	if ( trace.HitSky or !trace.HitPos or IsValid( trace.Entity ) and ( trace.Entity:IsPlayer() or trace.Entity:IsNPC() ) ) then return false end
 	if ( CLIENT ) then return true end
 
 	local ply = self:GetOwner()
@@ -157,7 +157,7 @@ function TOOL:UpdateGhostEntity( ent, ply )
 	local trace = ply:GetEyeTrace()
 
 	if ( !trace.Hit ) then return end
-	if ( IsValid( trace.Entity ) && ( trace.Entity:GetClass() == "item_item_crate" || trace.Entity:IsPlayer() ) ) then ent:SetNoDraw( true ) return end
+	if ( IsValid( trace.Entity ) and ( trace.Entity:GetClass() == "item_item_crate" or trace.Entity:IsPlayer() ) ) then ent:SetNoDraw( true ) return end
 
 	local ang = trace.HitNormal:Angle()
 	ang.pitch = ang.pitch - 270
@@ -172,7 +172,7 @@ function TOOL:UpdateGhostEntity( ent, ply )
 end
 
 function TOOL:Think()
-	if ( !IsValid( self.GhostEntity ) || self.GhostEntity:GetModel() != self:GetClientInfo( "model" ) ) then
+	if ( !IsValid( self.GhostEntity ) or self.GhostEntity:GetModel() != self:GetClientInfo( "model" ) ) then
 		self:MakeGhostEntity( self:GetClientInfo( "model" ), Vector( 0, 0, 0 ), Angle( 0, 0, 0 ) )
 	end
 

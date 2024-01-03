@@ -34,7 +34,7 @@ cleanup.Register( "env_headcrabcanisters" )
 
 if ( SERVER ) then
 
-	CreateConVar( "sbox_maxenv_headcrabcanisters", 4 )
+	CreateConVar( "sbox_maxenv_headcrabcanisters", 4, FCVAR_ARCHIVE )
 
 	numpad.Register( "env_headcrabcanister_fire", function( ply, env_headcrabcanister )
 		if ( !IsValid( env_headcrabcanister ) ) then return false end
@@ -50,7 +50,7 @@ if ( SERVER ) then
 	end )
 
 	function MakeHeadcrabCanister( ply, model, pos, ang, keyFire, keyOpen, keySpawn, fire_immediately, headcrab, count, speed, time, height, damage, radius, duration, spawnflags, smoke )
-		if ( IsValid( ply ) && !ply:CheckLimit( "env_headcrabcanisters" ) ) then return false end
+		if ( IsValid( ply ) and !ply:CheckLimit( "env_headcrabcanisters" ) ) then return false end
 
 		if ( tobool( smoke ) ) then duration = -1 end
 
@@ -130,8 +130,8 @@ if ( SERVER ) then
 			env_headcrabcanister.Inputs = Wire_CreateInputs( env_headcrabcanister, { "Open", "Spawn" } )
 
 			function env_headcrabcanister:TriggerInput( name, value )
-				if ( name == "Open" && value > 0 ) then self:Fire( "OpenCanister" ) end
-				if ( name == "Spawn" && value > 0 ) then self:Fire( "SpawnHeadcrabs" ) end
+				if ( name == "Open" and value > 0 ) then self:Fire( "OpenCanister" ) end
+				if ( name == "Spawn" and value > 0 ) then self:Fire( "SpawnHeadcrabs" ) end
 			end
 		end
 
@@ -197,8 +197,8 @@ function TOOL:UpdateGhostEntity( ent, ply )
 
 	local trace = ply:GetEyeTrace()
 
-	if ( !trace.Hit || trace.HitNormal.z < 0 ) then ent:SetNoDraw( true ) return end
-	if ( IsValid( trace.Entity ) && ( trace.Entity:GetClass() == "env_headcrabcanister" || trace.Entity:IsPlayer() || trace.Entity:IsNPC() ) ) then ent:SetNoDraw( true ) return end
+	if ( !trace.Hit or trace.HitNormal.z < 0 ) then ent:SetNoDraw( true ) return end
+	if ( IsValid( trace.Entity ) and ( trace.Entity:GetClass() == "env_headcrabcanister" or trace.Entity:IsPlayer() or trace.Entity:IsNPC() ) ) then ent:SetNoDraw( true ) return end
 
 	local min = ent:OBBMins()
 	local ang = Angle( math.sin( CurTime() ) * 16 - 55, trace.HitNormal:Angle().y, 0 )
@@ -214,7 +214,7 @@ function TOOL:UpdateGhostEntity( ent, ply )
 end
 
 function TOOL:Think()
-	if ( !IsValid( self.GhostEntity ) || self.GhostEntity:GetModel() != self.Model ) then
+	if ( !IsValid( self.GhostEntity ) or self.GhostEntity:GetModel() != self.Model ) then
 		self:MakeGhostEntity( self.Model, Vector( 0, 0, 0 ), Angle( 0, 0, 0 ) )
 	end
 

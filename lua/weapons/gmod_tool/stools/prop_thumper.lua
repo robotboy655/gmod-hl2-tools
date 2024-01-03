@@ -10,7 +10,7 @@ TOOL.ClientConVar[ "deactivate" ] = "39"
 cleanup.Register( "prop_thumpers" )
 
 if ( SERVER ) then
-	CreateConVar( "sbox_maxprop_thumpers", 10 )
+	CreateConVar( "sbox_maxprop_thumpers", 10, FCVAR_ARCHIVE + FCVAR_REPLICATED + FCVAR_NOTIFY )
 
 	numpad.Register( "prop_thumper_on", function( ply, prop_thumper )
 		if ( !IsValid( prop_thumper ) ) then return false end
@@ -23,7 +23,7 @@ if ( SERVER ) then
 	end )
 
 	function MakeThumper( ply, model, pos, ang, keyOn, keyOff, dustscale, targetname )
-		if ( IsValid( ply ) && !ply:CheckLimit( "prop_thumpers" ) ) then return nil end
+		if ( IsValid( ply ) and !ply:CheckLimit( "prop_thumpers" ) ) then return nil end
 
 		local prop_thumper = ents.Create( "prop_thumper" )
 		if ( !IsValid( prop_thumper ) ) then return false end
@@ -31,9 +31,9 @@ if ( SERVER ) then
 		prop_thumper:SetPos( pos )
 		prop_thumper:SetAngles( ang )
 
-		keyOn = keyOn || -1
-		keyOff = keyOff || -1
-		dustscale = tonumber( dustscale ) || 128
+		keyOn = keyOn or -1
+		keyOff = keyOff or -1
+		dustscale = tonumber( dustscale ) or 128
 
 		if ( model == "models/props_combine/combinethumper001a.mdl" ) then
 			local vec1 = Vector( -64, 72, 256 )
@@ -80,7 +80,7 @@ if ( SERVER ) then
 			prop_thumper.Inputs = Wire_CreateInputs( prop_thumper, { "Turn On" } )
 
 			function prop_thumper:TriggerInput( name, value )
-				if ( name == "Turn On" ) then self:Fire( value != 0 && "Enable" || "Disable" ) end
+				if ( name == "Turn On" ) then self:Fire( value != 0 and "Enable" or "Disable" ) end
 			end
 		end
 
@@ -91,8 +91,8 @@ if ( SERVER ) then
 end
 
 function TOOL:LeftClick( trace )
-	if ( trace.HitSky || !trace.HitPos || trace.HitNormal.z < 0.98 ) then return false end
-	if ( IsValid( trace.Entity ) && ( trace.Entity:GetClass() == "prop_thumper" || trace.Entity:IsPlayer() || trace.Entity:IsNPC() ) ) then return false end
+	if ( trace.HitSky or !trace.HitPos or trace.HitNormal.z < 0.98 ) then return false end
+	if ( IsValid( trace.Entity ) and ( trace.Entity:GetClass() == "prop_thumper" or trace.Entity:IsPlayer() or trace.Entity:IsNPC() ) ) then return false end
 	if ( CLIENT ) then return true end
 
 	local ply = self:GetOwner()
@@ -123,7 +123,7 @@ function TOOL:UpdateGhostEntity( ent, ply )
 
 	local trace = ply:GetEyeTrace()
 
-	if ( !trace.Hit || trace.HitNormal.z < 0.98 || IsValid( trace.Entity ) && ( trace.Entity:GetClass() == "prop_thumper" || trace.Entity:IsPlayer() || trace.Entity:IsNPC() ) ) then
+	if ( !trace.Hit or trace.HitNormal.z < 0.98 or IsValid( trace.Entity ) and ( trace.Entity:GetClass() == "prop_thumper" or trace.Entity:IsPlayer() or trace.Entity:IsNPC() ) ) then
 		ent:SetNoDraw( true )
 		return
 	end
@@ -141,7 +141,7 @@ function TOOL:UpdateGhostEntity( ent, ply )
 end
 
 function TOOL:Think()
-	if ( !IsValid( self.GhostEntity ) || self.GhostEntity:GetModel() != self:GetClientInfo( "model" ) ) then
+	if ( !IsValid( self.GhostEntity ) or self.GhostEntity:GetModel() != self:GetClientInfo( "model" ) ) then
 		self:MakeGhostEntity( self:GetClientInfo( "model" ), Vector( 0, 0, 0 ), Angle( 0, 0, 0 ) )
 	end
 	self:UpdateGhostEntity( self.GhostEntity, self:GetOwner() )

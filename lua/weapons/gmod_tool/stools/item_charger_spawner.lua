@@ -47,7 +47,7 @@ if ( SERVER ) then
 		ply:AddCleanup( "sents", item_charger )
 		item_charger:SetVar( "Player", ply )
 
-		return item_charger_spawner
+		return item_charger
 	end
 
 end

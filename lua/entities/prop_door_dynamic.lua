@@ -10,8 +10,6 @@ function ENT:Initialize()
 
 	if ( CLIENT ) then return end
 
-	self.Locked = false
-	self.Opened = false
 	self.NextToggle = 0
 	self.CloseDelay = 0
 
@@ -22,8 +20,20 @@ function ENT:Initialize()
 	end
 
 	if ( self:GetModel() == "models/props/portal_door_combined.mdl" ) then
-		self.Opened = true
+		self:SetOpened( true )
 		self:Close()
+	end
+
+end
+
+function ENT:SetupDataTables()
+
+	self:NetworkVar( "Bool", 0, "Opened" )
+	self:NetworkVar( "Bool", 1, "Locked" )
+
+	if ( SERVER ) then
+		self:SetOpened( false )
+		self:SetLocked( false )
 	end
 
 end
@@ -31,6 +41,19 @@ end
 function ENT:SetCloseDelay( num )
 
 	self.CloseDelay = tonumber( num )
+
+end
+
+function ENT:OnDuplicated( table )
+
+	-- On duplicaton, if opened, make sure the animation is all good
+	if ( self:GetOpened() ) then
+		self:SetOpened( false )
+		local locked = self:GetLocked()
+		self:SetLocked( false )
+		self:Open()
+		self:SetLocked( locked )
+	end
 
 end
 
@@ -42,7 +65,7 @@ end
 
 function ENT:Open()
 
-	if ( self.NextToggle > CurTime() or self.Locked or self.Opened == true ) then return end
+	if ( self.NextToggle > CurTime() or self:GetLocked() or self:GetOpened() == true ) then return end
 
 	self:PlayAnimation( "Open" )
 
@@ -74,7 +97,7 @@ function ENT:Open()
 	end
 
 	self.NextToggle = CurTime() + self:SequenceDuration()
-	self.Opened = true
+	self:SetOpened( true )
 
 	if ( self.CloseDelay < 0 ) then return end
 	timer.Create( "rb655_door_autoclose_" .. self:EntIndex(), self:SequenceDuration() + self.CloseDelay, 1, function() if ( IsValid( self ) ) then self:Close() end end )
@@ -83,7 +106,7 @@ end
 
 function ENT:Close()
 
-	if ( self.NextToggle > CurTime() or self.Locked or self.Opened == false ) then return end
+	if ( self.NextToggle > CurTime() or self:GetLocked() or self:GetOpened() == false ) then return end
 
 	timer.Remove( "rb655_door_autoclose_" .. self:EntIndex() )
 
@@ -117,7 +140,7 @@ function ENT:Close()
 	end
 
 	self.NextToggle = CurTime() + self:SequenceDuration()
-	self.Opened = false
+	self:SetOpened( false )
 
 end
 
@@ -136,14 +159,14 @@ function ENT:AcceptInput( name, activator, caller, data )
 
 	name = string.lower( name )
 
-	if ( name == "open" and self.NextToggle < CurTime() and !self.Locked and self.Opened == false ) then
+	if ( name == "open" and self.NextToggle < CurTime() and !self:GetLocked() and self:GetOpened() == false ) then
 		self:Open()
-	elseif ( name == "close" and self.NextToggle < CurTime() and !self.Locked and self.Opened == true ) then
+	elseif ( name == "close" and self.NextToggle < CurTime() and !self:GetLocked() and self:GetOpened() == true ) then
 		self:Close()
 	elseif ( name == "lock" ) then
-		self.Locked = true
+		self:SetLocked( true )
 	elseif ( name == "unlock" ) then
-		self.Locked = false
+		self:SetLocked( false )
 	end
 
 end

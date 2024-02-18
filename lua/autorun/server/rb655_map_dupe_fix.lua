@@ -51,3 +51,35 @@ hook.Add( "EntityKeyValue", "rb655_keyval_fix", function( ent, key, val )
 	end
 
 end )
+
+-- Ehhh... We gotta copy over wire_base_entity stuff for dupes
+function rb655_hl2_CopyWireModMethods( targetEnt )
+
+	function targetEnt:PreEntityCopy()
+		duplicator.ClearEntityModifier( self, "WireDupeInfo" )
+
+		-- build the DupeInfo table and save it as an entity mod
+		local DupeInfo = WireLib.BuildDupeInfo( self )
+		if ( DupeInfo ) then
+			duplicator.StoreEntityModifier( self, "WireDupeInfo", DupeInfo )
+		end
+	end
+
+	local function EntityLookup( createdEntities )
+		return function( id, default )
+			if ( id == nil ) then return default end
+			if ( id == 0 ) then return game.GetWorld() end
+			local ent = createdEntities[ id ]
+			if ( IsValid( ent ) ) then return ent else return default end
+		end
+	end
+	function targetEnt:PostEntityPaste( player, ent, createdEntities)
+		-- We manually apply the entity mod here rather than using a
+		-- duplicator.RegisterEntityModifier because we need access to the
+		-- CreatedEntities table.
+		if ( ent.EntityMods and ent.EntityMods.WireDupeInfo ) then
+			WireLib.ApplyDupeInfo( player, ent, ent.EntityMods.WireDupeInfo, EntityLookup( createdEntities ) )
+		end
+	end
+
+end

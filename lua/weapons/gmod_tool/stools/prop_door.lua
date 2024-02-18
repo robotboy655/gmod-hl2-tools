@@ -103,6 +103,20 @@ if ( SERVER ) then
 	numpad.Register( "prop_door_lock", function( ply, prop_door ) if ( !IsValid( prop_door ) ) then return false end prop_door:Fire( "Lock" ) end )
 	numpad.Register( "prop_door_unlock", function( ply, prop_door ) if ( !IsValid( prop_door ) ) then return false end prop_door:Fire( "Unlock" ) end )
 
+	local function ApplyWireModSupport( door, mapCreationID )
+		if ( Wire_CreateOutputs and !mapCreationID ) then
+			--door.Outputs = Wire_CreateOutputs( door, { "OnClosed", "OnOpened", "OnLocked", "OnUnlocked" } )
+			door.Inputs = Wire_CreateInputs( door, { "Open", "Lock" } )
+
+			function door:TriggerInput( name, value )
+				if ( name == "Open" ) then self:Fire( value != 0 and "Open" or "Close" ) end
+				if ( name == "Lock" ) then self:Fire( value != 0 and "Lock" or "Unlock" ) end
+			end
+
+			rb655_hl2_CopyWireModMethods( door )
+		end
+	end
+
 	function EnsureNameIsUnique( input )
 		local doors = ents.FindByName( input )
 		if ( #doors > 1 ) then
@@ -127,6 +141,8 @@ if ( SERVER ) then
 		if ( data and data.initialAngles ) then ang = data.initialAngles end
 		prop_door_rotating:SetAngles( ang )
 
+		ApplyWireModSupport( prop_door_rotating, mapCreationID )
+	
 		keyOpen = keyOpen or -1
 		keyClose = keyClose or -1
 		keyLock = keyLock or -1
@@ -225,16 +241,6 @@ if ( SERVER ) then
 
 		DoPropSpawnedEffect( prop_door_rotating )
 
-		if ( Wire_CreateOutputs and !mapCreationID ) then
-			--prop_door_rotating.Outputs = Wire_CreateOutputs( prop_door_rotating, { "OnClosed", "OnOpened", "OnLocked", "OnUnlocked" } )
-			prop_door_rotating.Inputs = Wire_CreateInputs( prop_door_rotating, { "Open", "Lock" } )
-
-			function prop_door_rotating:TriggerInput( name, value )
-				if ( name == "Open" ) then self:Fire( value != 0 and "Open" or "Close" ) end
-				if ( name == "Lock" ) then self:Fire( value != 0 and "Lock" or "Unlock" ) end
-			end
-		end
-
 		return prop_door_rotating
 
 	end
@@ -250,6 +256,8 @@ if ( SERVER ) then
 		prop_door_dynamic:SetModel( model )
 		prop_door_dynamic:SetPos( pos )
 		prop_door_dynamic:SetAngles( ang )
+
+		ApplyWireModSupport( prop_door_dynamic, mapCreationID )
 
 		prop_door_dynamic:Spawn()
 		prop_door_dynamic:Activate()
@@ -279,18 +287,6 @@ if ( SERVER ) then
 		end
 
 		DoPropSpawnedEffect( prop_door_dynamic )
-
-		if ( Wire_CreateOutputs and !mapCreationID ) then
-			local door = prop_door_dynamic
-			--door.Outputs = Wire_CreateOutputs( door, { "OnClosed", "OnOpened", "OnLocked", "OnUnlocked" } )
-			door.Inputs = Wire_CreateInputs( door, { "Open", "Lock" } )
-
-			function door:TriggerInput( name, value ) if ( self.RB655_Prop_Door_Dynamic ) then return self.RB655_Prop_Door_Dynamic:TriggerInput( name, value ) end end
-			function prop_door_dynamic:TriggerInput( name, value )
-				if ( name == "Open" ) then self:Fire( value != 0 and "Open" or "Close" ) end
-				if ( name == "Lock" ) then self:Fire( value != 0 and "Lock" or "Unlock" ) end
-			end
-		end
 
 		return prop_door_dynamic
 

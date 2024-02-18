@@ -134,6 +134,8 @@ if ( SERVER ) then
 				if ( name == "Open" and value > 0 ) then self:Fire( "OpenCanister" ) end
 				if ( name == "Spawn" and value > 0 ) then self:Fire( "SpawnHeadcrabs" ) end
 			end
+
+			rb655_hl2_CopyWireModMethods( env_headcrabcanister )
 		end
 
 		return env_headcrabcanister

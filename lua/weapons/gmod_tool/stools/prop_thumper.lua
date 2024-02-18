@@ -83,6 +83,8 @@ if ( SERVER ) then
 			function prop_thumper:TriggerInput( name, value )
 				if ( name == "Turn On" ) then self:Fire( value != 0 and "Enable" or "Disable" ) end
 			end
+
+			rb655_hl2_CopyWireModMethods( prop_thumper )
 		end
 
 		return prop_thumper

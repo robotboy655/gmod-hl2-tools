@@ -49,7 +49,7 @@ if ( SERVER ) then
 		env_headcrabcanister:Fire( "SpawnHeadcrabs" )
 	end )
 
-	function MakeHeadcrabCanister( ply, model, pos, ang, keyFire, keyOpen, keySpawn, fire_immediately, headcrab, count, speed, time, height, damage, radius, duration, spawnflags, smoke )
+	function MakeHeadcrabCanister( ply, model, pos, ang, keyFire, keyOpen, keySpawn, fire_immediately, headcrab, count, speed, time, height, damage, radius, duration, spawnflags, smoke, mapCreationID )
 		if ( IsValid( ply ) and !ply:CheckLimit( "env_headcrabcanisters" ) ) then return false end
 
 		if ( tobool( smoke ) ) then duration = -1 end
@@ -116,7 +116,8 @@ if ( SERVER ) then
 			radius = radius,
 			duration = duration,
 			spawnflags = spawnflags,
-			smoke = smoke
+			smoke = smoke,
+			MapCreationID = mapCreationID
 		} )
 
 		if ( IsValid( ply ) ) then
@@ -126,7 +127,7 @@ if ( SERVER ) then
 
 		DoPropSpawnedEffect( env_headcrabcanister )
 
-		if ( Wire_CreateOutputs ) then
+		if ( Wire_CreateOutputs and !mapCreationID ) then
 			env_headcrabcanister.Inputs = Wire_CreateInputs( env_headcrabcanister, { "Open", "Spawn" } )
 
 			function env_headcrabcanister:TriggerInput( name, value )
@@ -138,7 +139,7 @@ if ( SERVER ) then
 		return env_headcrabcanister
 	end
 
-	duplicator.RegisterEntityClass( "env_headcrabcanister", MakeHeadcrabCanister, "model", "pos", "ang", "keyFire", "keyOpen", "keySpawn", "fire_immediately", "headcrab", "count", "speed", "time", "height", "damage", "radius", "duration", "spawnflags", "smoke" )
+	duplicator.RegisterEntityClass( "env_headcrabcanister", MakeHeadcrabCanister, "model", "pos", "ang", "keyFire", "keyOpen", "keySpawn", "fire_immediately", "headcrab", "count", "speed", "time", "height", "damage", "radius", "duration", "spawnflags", "smoke", "MapCreationID" )
 
 end
 

@@ -22,7 +22,7 @@ if ( SERVER ) then
 		prop_thumper:Fire( "Disable" )
 	end )
 
-	function MakeThumper( ply, model, pos, ang, keyOn, keyOff, dustscale, targetname )
+	function MakeThumper( ply, model, pos, ang, keyOn, keyOff, dustscale, targetname, mapCreationID )
 		if ( IsValid( ply ) and !ply:CheckLimit( "prop_thumpers" ) ) then return nil end
 
 		local prop_thumper = ents.Create( "prop_thumper" )
@@ -66,7 +66,8 @@ if ( SERVER ) then
 			keyOn = keyOn,
 			keyOff = keyOff,
 			dustscale = dustscale,
-			targetname = targetname
+			targetname = targetname,
+			MapCreationID = mapCreationID
 		} )
 
 		if ( IsValid( ply ) ) then
@@ -76,7 +77,7 @@ if ( SERVER ) then
 
 		DoPropSpawnedEffect( prop_thumper )
 
-		if ( Wire_CreateOutputs ) then
+		if ( Wire_CreateOutputs and !mapCreationID ) then
 			prop_thumper.Inputs = Wire_CreateInputs( prop_thumper, { "Turn On" } )
 
 			function prop_thumper:TriggerInput( name, value )
@@ -87,7 +88,7 @@ if ( SERVER ) then
 		return prop_thumper
 	end
 
-	duplicator.RegisterEntityClass( "prop_thumper", MakeThumper, "model", "pos", "ang", "keyOn", "keyOff", "dustscale", "targetname" )
+	duplicator.RegisterEntityClass( "prop_thumper", MakeThumper, "model", "pos", "ang", "keyOn", "keyOff", "dustscale", "targetname", "MapCreationID" )
 end
 
 function TOOL:LeftClick( trace )

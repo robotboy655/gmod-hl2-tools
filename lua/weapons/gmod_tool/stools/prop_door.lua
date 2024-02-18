@@ -114,7 +114,7 @@ if ( SERVER ) then
 		return input
 	end
 
-	function MakeDoorRotating( ply, model, pos, ang, _oSkin, keyOpen, keyClose, keyLock, keyUnlock, _oHardware, _oDistance, _oSpeed, _oReturnDelay, breakable, _oTargetName, data )
+	function MakeDoorRotating( ply, model, pos, ang, _oSkin, keyOpen, keyClose, keyLock, keyUnlock, _oHardware, _oDistance, _oSpeed, _oReturnDelay, breakable, _oTargetName, data, mapCreationID )
 
 		if ( IsValid( ply ) and !ply:CheckLimit( "prop_doors" ) ) then return nil end
 
@@ -189,6 +189,7 @@ if ( SERVER ) then
 			keyLock = keyLock,
 			keyUnlock = keyUnlock,
 			breakable = breakable,
+			MapCreationID = mapCreationID,
 
 			rb655_dupe_data = {
 				spawnflags = spawnflags,
@@ -222,7 +223,9 @@ if ( SERVER ) then
 			ply:AddCleanup( "prop_doors", prop_door_rotating )
 		end
 
-		if ( Wire_CreateOutputs ) then
+		DoPropSpawnedEffect( prop_door_rotating )
+
+		if ( Wire_CreateOutputs and !mapCreationID ) then
 			--prop_door_rotating.Outputs = Wire_CreateOutputs( prop_door_rotating, { "OnClosed", "OnOpened", "OnLocked", "OnUnlocked" } )
 			prop_door_rotating.Inputs = Wire_CreateInputs( prop_door_rotating, { "Open", "Lock" } )
 
@@ -232,14 +235,12 @@ if ( SERVER ) then
 			end
 		end
 
-		DoPropSpawnedEffect( prop_door_rotating )
-
 		return prop_door_rotating
 
 	end
-	duplicator.RegisterEntityClass( "prop_door_rotating", MakeDoorRotating, "model", "pos", "ang", "skin", "keyOpen", "keyClose", "keyLock", "keyUnlock", "rHardware", "rDistance", "rSpeed", "auto_close_delay", "breakable", "targetname", "rb655_dupe_data" )
+	duplicator.RegisterEntityClass( "prop_door_rotating", MakeDoorRotating, "model", "pos", "ang", "skin", "keyOpen", "keyClose", "keyLock", "keyUnlock", "rHardware", "rDistance", "rSpeed", "auto_close_delay", "breakable", "targetname", "rb655_dupe_data", "MapCreationID" )
 
-	function MakeDoorDynamic( ply, model, pos, ang, keyOpen, keyClose, keyLock, keyUnlock, auto_close_delay, skin )
+	function MakeDoorDynamic( ply, model, pos, ang, keyOpen, keyClose, keyLock, keyUnlock, auto_close_delay, skin, mapCreationID )
 
 		if ( IsValid( ply ) and !ply:CheckLimit( "prop_doors" ) ) then return false end
 
@@ -268,7 +269,8 @@ if ( SERVER ) then
 			keyLock = keyLock,
 			keyUnlock = keyUnlock,
 			auto_close_delay = auto_close_delay,
-			skin = skin
+			skin = skin,
+			MapCreationID = mapCreationID
 		} )
 
 		if ( IsValid( ply ) ) then
@@ -278,7 +280,7 @@ if ( SERVER ) then
 
 		DoPropSpawnedEffect( prop_door_dynamic )
 
-		if ( Wire_CreateOutputs ) then
+		if ( Wire_CreateOutputs and !mapCreationID ) then
 			local door = prop_door_dynamic
 			--door.Outputs = Wire_CreateOutputs( door, { "OnClosed", "OnOpened", "OnLocked", "OnUnlocked" } )
 			door.Inputs = Wire_CreateInputs( door, { "Open", "Lock" } )
@@ -293,7 +295,7 @@ if ( SERVER ) then
 		return prop_door_dynamic
 
 	end
-	duplicator.RegisterEntityClass( "prop_door_dynamic", MakeDoorDynamic, "model", "pos", "ang", "keyOpen", "keyClose", "keyLock", "keyUnlock", "auto_close_delay", "skin" )
+	duplicator.RegisterEntityClass( "prop_door_dynamic", MakeDoorDynamic, "model", "pos", "ang", "keyOpen", "keyClose", "keyLock", "keyUnlock", "auto_close_delay", "skin", "MapCreationID" )
 
 end
 

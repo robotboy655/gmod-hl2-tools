@@ -37,6 +37,11 @@ hook.Add( "EntityKeyValue", "rb655_keyval_fix", function( ent, key, val )
 		if ( key == "targetname" ) then ent.rb655_dupe_data.targetname = val end
 		--if ( key == "slavename" ) then print( "slavename", key, val ) ent.rb655_dupe_data.targetname = val end
 
+		function ent:PreEntityCopy()
+			self.rb655_door_opened = self:GetInternalVariable( "m_eDoorState" ) != 0
+			self.rb655_door_locked = self:GetInternalVariable( "m_bLocked" )
+		end
+
 	elseif ( ent:GetClass() == "item_ammo_crate" ) then
 
 		if ( key == "AmmoType" ) then ent.type = val end
@@ -55,7 +60,10 @@ end )
 -- Ehhh... We gotta copy over wire_base_entity stuff for dupes
 function rb655_hl2_CopyWireModMethods( targetEnt )
 
+	local oldPreFunc = targetEnt.PreEntityCopy
 	function targetEnt:PreEntityCopy()
+		if ( oldPreFunc ) then oldPreFunc( self ) end
+
 		duplicator.ClearEntityModifier( self, "WireDupeInfo" )
 
 		-- build the DupeInfo table and save it as an entity mod
@@ -73,13 +81,17 @@ function rb655_hl2_CopyWireModMethods( targetEnt )
 			if ( IsValid( ent ) ) then return ent else return default end
 		end
 	end
-	function targetEnt:PostEntityPaste( player, ent, createdEntities)
+
+	local oldPostFunc = targetEnt.PostEntityPaste
+	function targetEnt:PostEntityPaste( player, ent, createdEntities )
 		-- We manually apply the entity mod here rather than using a
 		-- duplicator.RegisterEntityModifier because we need access to the
 		-- CreatedEntities table.
 		if ( ent.EntityMods and ent.EntityMods.WireDupeInfo ) then
 			WireLib.ApplyDupeInfo( player, ent, ent.EntityMods.WireDupeInfo, EntityLookup( createdEntities ) )
 		end
+
+		if ( oldPostFunc ) then oldPostFunc( self, player, ent, createdEntities ) end
 	end
 
 end

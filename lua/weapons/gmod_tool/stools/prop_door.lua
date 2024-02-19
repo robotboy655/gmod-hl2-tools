@@ -117,7 +117,7 @@ if ( SERVER ) then
 		end
 	end
 
-	function EnsureNameIsUnique( input )
+	local function EnsureNameIsUnique( input )
 		local doors = ents.FindByName( input )
 		if ( #doors > 1 ) then
 			--ErrorNoHalt( "Map already has 2 doors with name ", input , "\n" )
@@ -126,6 +126,23 @@ if ( SERVER ) then
 		end
 
 		return input
+	end
+
+	local function RotatingDoorPostDupe( door )
+
+		function door:PreEntityCopy()
+			self.rb655_door_opened = self:GetInternalVariable( "m_eDoorState" ) != 0
+			self.rb655_door_locked = self:GetInternalVariable( "m_bLocked" )
+		end
+
+		function door:OnDuplicated( table )
+
+			-- On duplicaton, if was opened, make it open
+			if ( table.rb655_door_opened ) then self:Fire( "Open" ) end
+			if ( table.rb655_door_locked ) then self:Fire( "Lock" ) end
+
+		end
+
 	end
 
 	function MakeDoorRotating( ply, model, pos, ang, _oSkin, keyOpen, keyClose, keyLock, keyUnlock, _oHardware, _oDistance, _oSpeed, _oReturnDelay, breakable, _oTargetName, data, mapCreationID )
@@ -141,8 +158,9 @@ if ( SERVER ) then
 		if ( data and data.initialAngles ) then ang = data.initialAngles end
 		prop_door_rotating:SetAngles( ang )
 
+		RotatingDoorPostDupe( prop_door_rotating )
 		ApplyWireModSupport( prop_door_rotating, mapCreationID )
-	
+
 		keyOpen = keyOpen or -1
 		keyClose = keyClose or -1
 		keyLock = keyLock or -1
@@ -327,13 +345,6 @@ function TOOL:LeftClick( trace )
 		local pos, angD = self:FixDynamicPos( mdl, trace.HitPos, ang )
 
 		prop_door = MakeDoorDynamic( ply, mdl, pos, angD, kO, kC, kL, kU, auto_close_delay, doorSkin )
-
-		-- print( prop_door.door:OBBMins().z )
-		--[[ This is HORRIBLE
-		prop_door.door:SetPos( pos - Vector( 0, 0, prop_door.door:OBBMins().z ) )
-		prop_door.door:Fire( "SetAnimation", "idle_closed" )
-		prop_door.door:Fire( "SetAnimation", "idleclosed" )
-		prop_door.door:Fire( "SetAnimation", "idle" )]]
 	else
 		prop_door = MakeDoorRotating( ply, mdl, trace.HitPos, ang, doorSkin, kO, kC, kL, kU, rH, rD, rS, auto_close_delay, breakable )
 		self:FixRotatingPos( prop_door )

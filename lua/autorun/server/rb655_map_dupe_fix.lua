@@ -21,6 +21,10 @@ hook.Add( "EntityKeyValue", "rb655_keyval_fix", function( ent, key, val )
 		if ( key == "dustscale" ) then ent.dustscale = val end
 		if ( key == "targetname" ) then ent.targetname = val end
 
+		function ent:PreEntityCopy()
+			self.rb655_disabled = !self:GetInternalVariable( "m_bEnabled" )
+		end
+
 	elseif ( ent:GetClass() == "prop_door_rotating" ) then
 
 		if ( !ent.rb655_dupe_data ) then ent.rb655_dupe_data = { ismapcreated = ent:CreatedByMap() } end

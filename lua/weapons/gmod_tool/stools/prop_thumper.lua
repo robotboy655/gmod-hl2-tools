@@ -22,7 +22,7 @@ if ( SERVER ) then
 		prop_thumper:Fire( "Disable" )
 	end )
 
-	function MakeThumper( ply, model, pos, ang, keyOn, keyOff, dustscale, targetname, mapCreationID )
+	function MakeThumper( ply, model, pos, ang, keyOn, keyOff, dustscale, targetname, mapCreationID, disabled )
 		if ( IsValid( ply ) and !ply:CheckLimit( "prop_thumpers" ) ) then return nil end
 
 		local prop_thumper = ents.Create( "prop_thumper" )
@@ -40,7 +40,7 @@ if ( SERVER ) then
 			vec1:Rotate( ang )
 			local Lpos = pos + vec1
 
-			local ladder = ents.Create("func_useableladder")
+			local ladder = ents.Create( "func_useableladder" )
 			ladder:SetPos( Lpos )
 			ladder:SetAngles( ang )
 			ladder:SetKeyValue( "targetname", "rb655_ThumperLadder_" .. prop_thumper:EntIndex() )
@@ -60,6 +60,7 @@ if ( SERVER ) then
 
 		prop_thumper.NumpadOn = numpad.OnDown( ply, keyOn, "prop_thumper_on", prop_thumper )
 		prop_thumper.NumpadOff = numpad.OnDown( ply, keyOff, "prop_thumper_off", prop_thumper )
+		if ( !disabled ) then prop_thumper:Fire( "Disable" ) end
 
 		table.Merge( prop_thumper:GetTable(), {
 			ply = ply,
@@ -90,7 +91,7 @@ if ( SERVER ) then
 		return prop_thumper
 	end
 
-	duplicator.RegisterEntityClass( "prop_thumper", MakeThumper, "model", "pos", "ang", "keyOn", "keyOff", "dustscale", "targetname", "MapCreationID" )
+	duplicator.RegisterEntityClass( "prop_thumper", MakeThumper, "model", "pos", "ang", "keyOn", "keyOff", "dustscale", "targetname", "MapCreationID", "rb655_disabled" )
 end
 
 function TOOL:LeftClick( trace )

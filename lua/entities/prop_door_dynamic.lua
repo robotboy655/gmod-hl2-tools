@@ -16,6 +16,7 @@ function ENT:Initialize()
 	-- self:PhysicsInit( SOLID_VPHYSICS )
 
 	if ( SERVER ) then
+		self:PhysicsInitStatic( SOLID_VPHYSICS )
 		self:CreateBoneFollowers()
 	end
 

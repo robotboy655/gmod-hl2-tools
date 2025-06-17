@@ -20,15 +20,6 @@ ToolModels[ 10 ] = "models/items/ammocrate_smg1.mdl"
 cleanup.Register( "item_ammo_crates" )
 
 if ( SERVER ) then
-
-	local rb655_force_downloads = CreateConVar( "rb655_force_downloads", "0", FCVAR_ARCHIVE )
-	if ( rb655_force_downloads:GetFloat() > 0 ) then
-
-		resource.AddFile( "models/items/ammocrate_357.mdl" )
-		resource.AddFile( "models/items/ammocrate_crossbow.mdl" )
-
-	end
-
 	CreateConVar( "sbox_maxitem_ammo_crates", 10, FCVAR_ARCHIVE + FCVAR_REPLICATED + FCVAR_NOTIFY )
 
 	function MakeAmmoCrate( ply, model, pos, ang, type )

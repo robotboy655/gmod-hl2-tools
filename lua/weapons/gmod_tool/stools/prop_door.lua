@@ -329,7 +329,7 @@ function TOOL:LeftClick( trace )
 	if ( self:GetClientNumber( "auto_close" ) <= 0 ) then auto_close_delay = -1 end
 
 	local mdl = self:GetClientInfo( "model" )
-	if ( !list.HasEntry( "DoorModels", model ) ) then return nil end
+	if ( !list.HasEntry( "DoorModels", mdl ) ) then return nil end
 
 	local kO = self:GetClientNumber( "key_open" )
 	local kC = self:GetClientNumber( "key_close" )
